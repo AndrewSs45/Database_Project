@@ -212,9 +212,15 @@ Extra (optional):
 
 ISC
 
-## 👤 Author
+## 👤 Authors
 
-Your Name
+Chiara Baldasarre Coppi.
+
+Isabela Ortega Vasco.
+
+Daniel david barrios castillo.
+
+Andrés Felipe C Cañón.
 
 ---
 
