@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniTutorAdmin Dashboard</title>
+  <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1>📊 Performance Overview</h1>
+    <p>UniTutorAdmin - Sistema de Gestión Académica</p>
+  </div>
+
+  <div class="dashboard-container">
+    <!-- Alerts -->
+    <div id="alertContainer"></div>
+
+    <!-- KPIs Section -->
+    <div class="kpi-section">
+      <div class="kpi-card professors">
+        <div class="kpi-content">
+          <div class="kpi-label">Profesores</div>
+          <div class="kpi-number"><%= kpis.totalProfessors || 0 %></div>
+        </div>
+        <div class="kpi-icon">👨‍🏫</div>
+      </div>
+
+      <div class="kpi-card students">
+        <div class="kpi-content">
+          <div class="kpi-label">Estudiantes</div>
+          <div class="kpi-number"><%= kpis.totalStudents || 0 %></div>
+        </div>
+        <div class="kpi-icon">👨‍🎓</div>
+      </div>
+
+      <div class="kpi-card tutors">
+        <div class="kpi-content">
+          <div class="kpi-label">Tutores</div>
+          <div class="kpi-number"><%= kpis.totalTutors || 0 %></div>
+        </div>
+        <div class="kpi-icon">👨‍👩‍👧</div>
+      </div>
+
+      <div class="kpi-card events">
+        <div class="kpi-content">
+          <div class="kpi-label">Próximos Eventos</div>
+          <div class="kpi-number"><%= kpis.upcomingEvents || 0 %></div>
+        </div>
+        <div class="kpi-icon">📅</div>
+      </div>
+    </div>
+
+    <!-- Profesores Section -->
+    <h2 class="section-title">Profesores</h2>
+    <div class="table-section">
+      <% if (professors && professors.length > 0) { %>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Edad</th>
+              <th>Características</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% professors.forEach(prof => { %>
+              <tr>
+                <td><strong><%= prof.userId %></strong></td>
+                <td><%= prof.getFullName() %></td>
+                <td><%= prof.email || '-' %></td>
+                <td><%= prof.age %></td>
+                <td><%= prof.characteristics || '-' %></td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-primary btn-sm" onclick="editUser('<%= prof.userId %>', '<%= prof.age %>', '<%= prof.characteristics || '' %>')">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteUser('<%= prof.userId %>')">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <div class="no-data">No hay profesores registrados</div>
+      <% } %>
+    </div>
+
+    <!-- Tutores Section -->
+    <h2 class="section-title">Tutores / Apoderados</h2>
+    <div class="table-section">
+      <button class="btn btn-success" onclick="openTutorModal()">+ Nuevo Tutor</button>
+      <% if (tutors && tutors.length > 0) { %>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Estudiante ID</th>
+              <th>Nombre Completo</th>
+              <th>Teléfono</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% tutors.forEach(tutor => { %>
+              <tr>
+                <td><strong><%= tutor.tutorId %></strong></td>
+                <td><%= tutor.userId %></td>
+                <td><%= tutor.getFullName() %></td>
+                <td><%= tutor.contactNumber %></td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-primary btn-sm" onclick="editTutor('<%= tutor.tutorId %>', '<%= tutor.userId %>', '<%= tutor.firstName %>', '<%= tutor.lastName %>', '<%= tutor.contactNumber %>')">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteTutor('<%= tutor.tutorId %>')">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <div class="no-data">No hay tutores registrados</div>
+      <% } %>
+    </div>
+
+    <!-- Condiciones Médicas Section -->
+    <h2 class="section-title">Condiciones Médicas</h2>
+    <div class="table-section">
+      <% if (medicalConditions && medicalConditions.length > 0) { %>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Estudiante ID</th>
+              <th>Condición</th>
+              <th>Descripción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% medicalConditions.forEach(cond => { %>
+              <tr>
+                <td><strong><%= cond.conditionId %></strong></td>
+                <td><%= cond.userId %></td>
+                <td><span class="badge badge-warning"><%= cond.conditionName %></span></td>
+                <td><%= cond.description || '-' %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <div class="no-data">No hay condiciones médicas registradas</div>
+      <% } %>
+    </div>
+
+    <!-- Reconocimientos Section -->
+    <h2 class="section-title">Reconocimientos Recientes</h2>
+    <div class="table-section">
+      <% if (recognitions && recognitions.length > 0) { %>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Estudiante ID</th>
+              <th>Descripción</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% recognitions.forEach(recog => { %>
+              <tr>
+                <td><strong><%= recog.recognitionId %></strong></td>
+                <td><%= recog.userId %></td>
+                <td><span class="badge badge-success"><%= recog.description %></span></td>
+                <td><%= recog.getDateFormatted() %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <div class="no-data">No hay reconocimientos registrados</div>
+      <% } %>
+    </div>
+
+    <!-- Anotaciones Section -->
+    <h2 class="section-title">Anotaciones Recientes</h2>
+    <div class="table-section">
+      <% if (annotations && annotations.length > 0) { %>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Estudiante ID</th>
+              <th>Descripción</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% annotations.forEach(annot => { %>
+              <tr>
+                <td><strong><%= annot.annotationId %></strong></td>
+                <td><%= annot.userId %></td>
+                <td><span class="badge badge-info"><%= annot.description %></span></td>
+                <td><%= annot.getDateFormatted() %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <div class="no-data">No hay anotaciones registradas</div>
+      <% } %>
+    </div>
+
+    <!-- Créditos Section -->
+    <h2 class="section-title">Créditos Estudiantiles</h2>
+    <div class="table-section">
+      <% if (credits && credits.length > 0) { %>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Estudiante ID</th>
+              <th>Tipo</th>
+              <th>Razón</th>
+              <th>Valor</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% credits.forEach(credit => { %>
+              <tr>
+                <td><strong><%= credit.creditId %></strong></td>
+                <td><%= credit.userId %></td>
+                <td>
+                  <% if (credit.isPositive()) { %>
+                    <span class="badge badge-success">+ Positivo</span>
+                  <% } else { %>
+                    <span class="badge badge-danger">- Negativo</span>
+                  <% } %>
+                </td>
+                <td><%= credit.reason %></td>
+                <td><strong><%= credit.value %></strong></td>
+                <td><%= credit.getDateFormatted() %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <div class="no-data">No hay créditos registrados</div>
+      <% } %>
+    </div>
+
+    <!-- Eventos Section -->
+    <h2 class="section-title">Eventos Académicos</h2>
+    <div class="table-section">
+      <% if (events && events.length > 0) { %>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre del Evento</th>
+              <th>Descripción</th>
+              <th>Fecha</th>
+              <th>Ubicación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% events.forEach(event => { %>
+              <tr>
+                <td><strong><%= event.eventId %></strong></td>
+                <td><%= event.eventName %></td>
+                <td><%= event.description || '-' %></td>
+                <td><%= event.getDateFormatted() %></td>
+                <td><%= event.location || '-' %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <div class="no-data">No hay eventos registrados</div>
+      <% } %>
+    </div>
+
+    <!-- Asistencia Section -->
+    <h2 class="section-title">Control de Asistencia</h2>
+    <div class="table-section">
+      <% if (attendance && attendance.length > 0) { %>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Estudiante ID</th>
+              <th>Evento ID</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% attendance.forEach(att => { %>
+              <tr>
+                <td><strong><%= att.attendanceId %></strong></td>
+                <td><%= att.userId %></td>
+                <td><%= att.eventId %></td>
+                <td><%= att.getDateFormatted() %></td>
+                <td>
+                  <% if (att.isPresent()) { %>
+                    <span class="badge badge-success">✓ Presente</span>
+                  <% } else if (att.isJustified()) { %>
+                    <span class="badge badge-warning">◐ Justificado</span>
+                  <% } else { %>
+                    <span class="badge badge-danger">✗ Ausente</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <div class="no-data">No hay registros de asistencia</div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div id="editUserModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeEditUserModal()">×</button>
+      <div class="modal-header">Editar Información del Usuario</div>
+      <form id="editUserForm">
+        <div class="form-group">
+          <label>Usuario ID (Lectura)</label>
+          <input type="text" id="editUserId" readonly>
+        </div>
+        <div class="form-group">
+          <label>Edad</label>
+          <input type="number" id="editUserAge" min="1" max="120">
+        </div>
+        <div class="form-group">
+          <label>Características</label>
+          <textarea id="editUserCharacteristics" rows="3"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tutor Modal -->
+  <div id="tutorModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeTutorModal()">×</button>
+      <div class="modal-header" id="tutorModalTitle">Nuevo Tutor</div>
+      <form id="tutorForm">
+        <input type="hidden" id="tutorIdField">
+        <div class="form-group">
+          <label>Estudiante ID *</label>
+          <input type="text" id="tutorUserId" required>
+        </div>
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input type="text" id="tutorFirstName" required>
+        </div>
+        <div class="form-group">
+          <label>Apellido *</label>
+          <input type="text" id="tutorLastName" required>
+        </div>
+        <div class="form-group">
+          <label>Teléfono de Contacto *</label>
+          <input type="text" id="tutorContactNumber" required>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeTutorModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Tutor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Alert function
+    function showAlert(message, type = 'success') {
+      const alertContainer = document.getElementById('alertContainer');
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type}`;
+      alertDiv.textContent = message;
+      alertContainer.appendChild(alertDiv);
+      setTimeout(() => alertDiv.remove(), 4000);
+    }
+
+    // Edit User Modal
+    function editUser(userId, age, characteristics) {
+      document.getElementById('editUserId').value = userId;
+      document.getElementById('editUserAge').value = age;
+      document.getElementById('editUserCharacteristics').value = characteristics;
+      document.getElementById('editUserModal').classList.add('active');
+    }
+
+    function closeEditUserModal() {
+      document.getElementById('editUserModal').classList.remove('active');
+    }
+
+    document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userId = document.getElementById('editUserId').value;
+      const age = document.getElementById('editUserAge').value;
+      const characteristics = document.getElementById('editUserCharacteristics').value;
+
+      try {
+        const response = await fetch('/users/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            field: 'Age',
+            value: age
+          })
+        });
+        const result = await response.json();
+        if (result.success) {
+          showAlert('Edad actualizada correctamente', 'success');
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          showAlert(result.error, 'danger');
+        }
+      } catch (error) {
+        showAlert('Error al actualizar usuario', 'danger');
+      }
+    });
+
+    // Delete User
+    async function deleteUser(userId) {
+      if (!confirm(`¿Está seguro de que desea eliminar al usuario ${userId}?`)) return;
+
+      try {
+        const response = await fetch('/users/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId })
+        });
+        const result = await response.json();
+        if (result.success) {
+          showAlert('Usuario eliminado correctamente', 'success');
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          showAlert(result.error, 'danger');
+        }
+      } catch (error) {
+        showAlert('Error al eliminar usuario', 'danger');
+      }
+    }
+
+    // Tutor Modal
+    function openTutorModal() {
+      document.getElementById('tutorIdField').value = '';
+      document.getElementById('tutorUserId').value = '';
+      document.getElementById('tutorFirstName').value = '';
+      document.getElementById('tutorLastName').value = '';
+      document.getElementById('tutorContactNumber').value = '';
+      document.getElementById('tutorModalTitle').textContent = 'Nuevo Tutor';
+      document.getElementById('tutorModal').classList.add('active');
+    }
+
+    function editTutor(tutorId, userId, firstName, lastName, contactNumber) {
+      document.getElementById('tutorIdField').value = tutorId;
+      document.getElementById('tutorUserId').value = userId;
+      document.getElementById('tutorFirstName').value = firstName;
+      document.getElementById('tutorLastName').value = lastName;
+      document.getElementById('tutorContactNumber').value = contactNumber;
+      document.getElementById('tutorModalTitle').textContent = 'Editar Tutor';
+      document.getElementById('tutorModal').classList.add('active');
+    }
+
+    function closeTutorModal() {
+      document.getElementById('tutorModal').classList.remove('active');
+    }
+
+    document.getElementById('tutorForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tutorId = document.getElementById('tutorIdField').value;
+      const userId = document.getElementById('tutorUserId').value;
+      const firstName = document.getElementById('tutorFirstName').value;
+      const lastName = document.getElementById('tutorLastName').value;
+      const contactNumber = document.getElementById('tutorContactNumber').value;
+
+      const endpoint = tutorId ? '/tutors/update' : '/tutors/create';
+      const payload = tutorId
+        ? { tutorId: parseInt(tutorId), userId, firstName, lastName, contactNumber }
+        : { userId, firstName, lastName, contactNumber };
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (result.success) {
+          showAlert(tutorId ? 'Tutor actualizado correctamente' : 'Tutor creado correctamente', 'success');
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          showAlert(result.error, 'danger');
+        }
+      } catch (error) {
+        showAlert('Error al procesar tutor', 'danger');
+      }
+    });
+
+    // Delete Tutor
+    async function deleteTutor(tutorId) {
+      if (!confirm(`¿Está seguro de que desea eliminar al tutor ${tutorId}?`)) return;
+
+      try {
+        const response = await fetch('/tutors/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tutorId })
+        });
+        const result = await response.json();
+        if (result.success) {
+          showAlert('Tutor eliminado correctamente', 'success');
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          showAlert(result.error, 'danger');
+        }
+      } catch (error) {
+        showAlert('Error al eliminar tutor', 'danger');
+      }
+    }
+
+    // Close modals on outside click
+    window.addEventListener('click', (event) => {
+      const editModal = document.getElementById('editUserModal');
+      const tutorModal = document.getElementById('tutorModal');
+      if (event.target === editModal) {
+        closeEditUserModal();
+      }
+      if (event.target === tutorModal) {
+        closeTutorModal();
+      }
+    });
+  </script>
+</body>
+</html>

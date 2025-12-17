@@ -1,0 +1,1 @@
+{"version":3,"file":"main.css","mappings":";;;AAAA,OAAO;;AAEP,kEAAkE","sources":["webpack://jala-db-server/./src/frontend/styles.css"],"sourcesContent":["body { }\r\n\r\n/* Add minimal styles that won't conflict with server-side views */\r\n"],"names":[],"ignoreList":[],"sourceRoot":""}

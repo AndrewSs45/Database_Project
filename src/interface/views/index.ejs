@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Front end!</title>
+  <% if (process.env.NODE_ENV === 'production') { %>
+    <link rel="stylesheet" href="/dist/main.css">
+    <script defer src="/dist/main.bundle.js"></script>
+  <% } else { %>
+    <!-- In development, run `npm run dev:webpack` to watch and build assets to /dist -->
+  <% } %>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #4b69a2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+      padding: 30px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .error {
+      background: #ff4757;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .table-title {
+      font-size: 1.8rem;
+      color: #667eea;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 3px solid #667eea;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-title::before {
+      content: '📊';
+      font-size: 1.5rem;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px;
+    }
+
+    thead {
+      background: linear-gradient(135deg, #667eea 0%, #4b69a2 100%);
+      color: white;
+    }
+
+    th {
+      padding: 15px 20px;
+      text-align: left;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+
+    tbody tr:hover {
+      background: #e3e7ff;
+      transform: scale(1.01);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    }
+
+    td {
+      padding: 15px 20px;
+      color: #333;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-style: italic;
+    }
+
+    .row-count {
+      margin-top: 15px;
+      color: #666;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: white;
+    }
+
+    .empty-state h2 {
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+
+    .empty-state p {
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .table-container {
+        padding: 20px;
+      }
+
+      .table-title {
+        font-size: 1.4rem;
+      }
+
+      th, td {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Front end!</h1>
+      <p>Vamos a construir una interfaz para visualizar las tablas de la base de datos</p>
+    </div>
+
+    <% if (error) { %>
+      <div class="error">
+        <strong>⚠️ Error:</strong> <%= error %>
+      </div>
+    <% } %>
+
+    <% if (tables && tables.length > 0) { %>
+      <% tables.forEach(table => { %>
+        <div class="table-container">
+          <h2 class="table-title"><%= table.tableName %></h2>
+          
+          <% if (table.rows && table.rows.length > 0) { %>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <% table.columns.forEach(column => { %>
+                      <th><%= column %></th>
+                    <% }); %>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% table.rows.forEach(row => { %>
+                    <tr>
+                      <% table.columns.forEach(column => { %>
+                        <td><%= row[column] !== null ? row[column] : 'NULL' %></td>
+                      <% }); %>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+            <p class="row-count">📝 Showing <%= table.rows.length %> row(s)</p>
+          <% } else { %>
+            <p class="no-data">No data available in this table</p>
+          <% } %>
+        </div>
+      <% }); %>
+    <% } else if (!error) { %>
+      <div class="empty-state">
+        <h2>No Tables Found</h2>
+        <p>The database appears to be empty or not connected.</p>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

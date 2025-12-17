@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalizar una query</title>
+       <% if (process.env.NODE_ENV === 'production') { %>
+           <link rel="stylesheet" href="/dist/main.css">
+           <script defer src="/dist/main.bundle.js"></script>
+       <% } %>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: #cccccc;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: #2d2d30;
+            border-radius: 15px;
+            border: 1px solid #3e3e42;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #d4d4d4;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #858585;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #9cdcfe;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: #3e3e42;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid #555555;
+        }
+
+        .nav-links a:hover {
+            background: #505053;
+            border-color: #9cdcfe;
+        }
+
+        .error {
+            background: #5a1e1e;
+            color: #f48771;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid #8b3a3a;
+        }
+
+        .query-info {
+            background: #252526;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #3e3e42;
+        }
+
+        .query-info h3 {
+            color: #4ec9b0;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .query-info h3::before {
+            content: '⚡';
+            font-size: 1.2rem;
+        }
+
+        .query-box {
+            background: #1e1e1e;
+            color: #ce9178;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid #3e3e42;
+        }
+
+        .info-text {
+            margin-top: 15px;
+            color: #858585;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .table-container {
+            background: #252526;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #3e3e42;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table-title {
+            font-size: 1.8rem;
+            color: #4ec9b0;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3e3e42;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-title::before {
+            content: '📊';
+            font-size: 1.5rem;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid #3e3e42;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+
+        thead {
+            background: #2d2d30;
+            color: #d4d4d4;
+        }
+
+        th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #3e3e42;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #1e1e1e;
+        }
+
+        tbody tr:nth-child(odd) {
+            background: #252526;
+        }
+
+        tbody tr:hover {
+            background: #37373d;
+        }
+
+        td {
+            padding: 15px 20px;
+            color: #cccccc;
+            border-bottom: 1px solid #3e3e42;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #858585;
+            font-style: italic;
+        }
+
+        .row-count {
+            margin-top: 15px;
+            color: #858585;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #cccccc;
+        }
+
+        .empty-state h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #d4d4d4;
+        }
+
+        .empty-state p {
+            font-size: 1.2rem;
+            color: #858585;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .table-container {
+                padding: 20px;
+            }
+
+            .table-title {
+                font-size: 1.4rem;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            .nav-links {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Ejecutemos una query especifica</h1>
+        </div>
+
+        <% if (query) { %>
+            <div class="query-info">
+                <h3>Current Query</h3>
+                <div class="query-box"><%= query %></div>
+            </div>
+        <% } %>
+
+        <% if (error) { %>
+            <div class="error">
+                <strong>⚠️ Error:</strong> <%= error %>
+                <p style="margin-top: 10px; font-size: 0.9rem;">
+                    Make sure your SQL query is valid and CUSTOM_SQL_QUERY is configured in .env
+                </p>
+            </div>
+        <% } %>
+
+        <% if (result) { %>
+            <div class="table-container">
+                <h2 class="table-title"><%= result.tableName %></h2>
+                
+                <% if (result.rows && result.rows.length > 0) { %>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <% result.columns.forEach(column => { %>
+                                        <th><%= column %></th>
+                                    <% }); %>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% result.rows.forEach(row => { %>
+                                    <tr>
+                                        <% result.columns.forEach(column => { %>
+                                            <td><%= row[column] !== null ? row[column] : 'NULL' %></td>
+                                        <% }); %>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="row-count">📝 Showing <%= result.rows.length %> row(s)</p>
+                <% } else { %>
+                    <p class="no-data">Query executed successfully but returned no rows</p>
+                <% } %>
+            </div>
+        <% } else if (!error) { %>
+            <div class="empty-state">
+                <h2>No Query Configured</h2>
+                <p>Please set the CUSTOM_SQL_QUERY variable in your .env file<br>to specify which SQL query to execute.</p>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{
+  "name": "jala-db-server",
+  "version": "1.0.0",
+  "description": "Clean architecture Node.js server with MySQL integration",
+  "main": "src/infrastructure/server.js",
+  "scripts": {
+    "start": "node src/infrastructure/server.js",
+    "dev": "nodemon src/infrastructure/server.js",
+    "build": "webpack --mode production",
+    "dev:webpack": "webpack --watch --mode development"
+  },
+  "keywords": [
+    "nodejs",
+    "mysql",
+    "clean-architecture",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "mongoose": "^9.0.1",
+    "mysql2": "^3.6.5",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^6.11.0",
+    "mini-css-extract-plugin": "^2.9.4",
+    "nodemon": "^3.0.2",
+    "style-loader": "^3.3.4",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.2"
+  }
+}
